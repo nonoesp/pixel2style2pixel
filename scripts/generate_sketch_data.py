@@ -13,34 +13,30 @@ The sketch simplification model (sketch_gan.t7) from Simo Serra et al. can be do
 """
 
 
-def sobel(img):
-    opImgx = cv2.Sobel(img, cv2.CV_8U, 0, 1, ksize=3)
-    opImgy = cv2.Sobel(img, cv2.CV_8U, 1, 0, ksize=3)
+def sobel(img, ksize=3):
+    opImgx = cv2.Sobel(img, cv2.CV_8U, 0, 1, ksize=ksize)
+    opImgy = cv2.Sobel(img, cv2.CV_8U, 1, 0, ksize=ksize)
     return cv2.bitwise_or(opImgx, opImgy)
 
 
-def sketch(frame):
-    frame = cv2.GaussianBlur(frame, (3, 3), 0)
+def sketch(frame, blur_size=3, sobel_size=3):
+    frame = cv2.GaussianBlur(frame, (blur_size, blur_size), 0)
     invImg = 255 - frame
-    edgImg0 = sobel(frame)
-    edgImg1 = sobel(invImg)
+    edgImg0 = sobel(frame, sobel_size)
+    edgImg1 = sobel(invImg, sobel_size)
     edgImg = cv2.addWeighted(edgImg0, 0.75, edgImg1, 0.75, 0)
     opImg = 255 - edgImg
     return opImg
 
 
-def get_sketch_image(image_path):
+def get_sketch_image(image_path, blur_size, sobel_size):
     original = cv2.imread(image_path)
     original = cv2.cvtColor(original, cv2.COLOR_BGR2GRAY)
-    sketch_image = sketch(original)
+    sketch_image = sketch(original, blur_size, sobel_size)
     return sketch_image[:, :, np.newaxis]
 
 
-def simplify(input_dir, output_dir, model):
-
-    print('Input ›', input_dir)
-    print('Output ›', output_dir)
-    print('Model ›', model)
+def simplify(input_dir, output_dir, model, blur_size=3, sobel_size=3):
 
     use_cuda = True
 
@@ -58,7 +54,7 @@ def simplify(input_dir, output_dir, model):
     for idx, image_path in enumerate(images):
         if idx % 50 == 0:
             print("{} out of {}".format(idx, len(images)))
-        data = get_sketch_image(image_path)
+        data = get_sketch_image(image_path, blur_size, sobel_size)
         data = ((transforms.ToTensor()(data) - immean) / imstd).unsqueeze(0)
         if use_cuda:
             pred = model.cuda().forward(data.cuda()).float()
@@ -74,6 +70,8 @@ if __name__ == '__main__':
     parser.add_argument('-i', '--input', required=True, help='Directory containing input images.')
     parser.add_argument('-o', '--output', required=True, help='Directory containing output sketches.')
     parser.add_argument('-m', '--model', required=True, help='Path to pre-trained model.')
+    parser.add_argument('-b', '--blur', default=3, help='Gaussian blur kernel size.')
+    parser.add_argument('-s', '--sobel', default=3, help='Sobel kernel size.')
     opt = parser.parse_args()
     
-    simplify(opt.input, opt.output, opt.model)
+    simplify(opt.input, opt.output, opt.model, opt.blur, opt.sobel)
