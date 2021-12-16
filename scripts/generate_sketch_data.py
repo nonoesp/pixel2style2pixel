@@ -70,8 +70,8 @@ if __name__ == '__main__':
     parser.add_argument('-i', '--input', required=True, help='Directory containing input images.')
     parser.add_argument('-o', '--output', required=True, help='Directory containing output sketches.')
     parser.add_argument('-m', '--model', required=True, help='Path to pre-trained model.')
-    parser.add_argument('-b', '--blur', default=3, help='Gaussian blur kernel size.')
-    parser.add_argument('-s', '--sobel', default=3, help='Sobel kernel size.')
+    parser.add_argument('-b', '--blur', default=3, type=int, help='Gaussian blur kernel size.')
+    parser.add_argument('-s', '--sobel', default=3, type=int, help='Sobel kernel size.')
     opt = parser.parse_args()
     
     simplify(opt.input, opt.output, opt.model, opt.blur, opt.sobel)
