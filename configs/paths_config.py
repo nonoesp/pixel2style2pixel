@@ -6,6 +6,10 @@ dataset_paths = {
 	'celeba_train_segmentation': '',
 	'celeba_test_segmentation': '',
 	'ffhq': '',
+	'daisies_train_sketch': 'data/psp_dataset/train_sketch',
+	'daisies_train': 'data/psp_dataset/train_photo',
+	'daisies_test_sketch': 'data/psp_dataset/test_sketch',
+	'daisies_test': 'data/psp_dataset/test_photo',  	
 }
 
 model_paths = {

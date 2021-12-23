@@ -3,6 +3,13 @@ from configs.paths_config import dataset_paths
 
 
 DATASETS = {
+	'flowers_sketch_to_daisies': {
+		'transforms': transforms_config.SketchToImageTransforms,
+		'train_source_root': dataset_paths['daisies_train_sketch'],
+		'train_target_root': dataset_paths['daisies_train'],
+		'test_source_root': dataset_paths['daisies_test_sketch'],
+		'test_target_root': dataset_paths['daisies_test'],
+	},	
 	'ffhq_encode': {
 		'transforms': transforms_config.EncodeTransforms,
 		'train_source_root': dataset_paths['ffhq'],
